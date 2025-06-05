@@ -127,7 +127,35 @@ cd app && npm install --legacy-peer-deps
   ```sh
   anchor keys list
   ```
-- Update `Anchor.toml` and `lib.rs` with your program ID.
+
+After running the following command to retrieve your program's public key:
+
+```sh
+anchor keys list
+```
+
+You will see output similar to:
+
+```
+escrow_service: EZUZxExAfPrc4oQt5sXJcyNg4w113erzjkaPEX87BHEw
+```
+
+**Copy the `programId` and update your configuration files as follows:**
+
+- **In `Anchor.toml`** (under `[programs.devnet]`):
+
+```toml
+[programs.devnet]
+escrow_service = "EZUZxExAfPrc4oQt5sXJcyNg4w113erzjkaPEX87BHEw"
+```
+
+- **In `lib.rs`** (at the top of your program):
+
+```rust
+declare_id!("EZUZxExAfPrc4oQt5sXJcyNg4w113erzjkaPEX87BHEw");
+```
+
+> ⚡ **Tip:** Keeping your `programId` consistent across these files ensures your frontend and deployment scripts interact with the correct Solana program on Devnet.
 
 ### 4. Build & Deploy
 
