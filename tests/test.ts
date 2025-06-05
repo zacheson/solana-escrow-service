@@ -1,6 +1,14 @@
-import * as anchor from "@coral-xyz/anchor";
-import { AnchorEscrow } from "../target/types/anchor_escrow";
-import { Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionMessage, VersionedTransaction } from "@solana/web3.js";
+import * as anchor from "@coral-xyz/anchor"
+import { AnchorEscrow } from "../target/types/escrow_service"
+import {
+  Keypair,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  TransactionMessage,
+  VersionedTransaction,
+} from "@solana/web3.js"
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   MINT_SIZE,
@@ -10,30 +18,30 @@ import {
   createMintToInstruction,
   getAssociatedTokenAddressSync,
   getMinimumBalanceForRentExemptMint,
-} from "@solana/spl-token";
-import { randomBytes } from "crypto";
+} from "@solana/spl-token"
+import { randomBytes } from "crypto"
 
-describe("anchor-escrow", () => {
+describe("escrow_service", () => {
   // 0. Set provider, connection and program
-  anchor.setProvider(anchor.AnchorProvider.env());
-  const provider = anchor.getProvider();
-  const connection = provider.connection;
-  const program = anchor.workspace.AnchorEscrow as anchor.Program<AnchorEscrow>;
+  anchor.setProvider(anchor.AnchorProvider.env())
+  const provider = anchor.getProvider()
+  const connection = provider.connection
+  const program = anchor.workspace.AnchorEscrow as anchor.Program<AnchorEscrow>
 
   // 1. Boilerplate
   // Determine dummy token mints and token account addresses
-  const [initializer, taker, mintA, mintB] = Array.from({ length: 4 }, () => Keypair.generate());
+  const [initializer, taker, mintA, mintB] = Array.from({ length: 4 }, () => Keypair.generate())
   const [initializerAtaA, initializerAtaB, takerAtaA, takerAtaB] = [initializer, taker]
     .map((a) => [mintA, mintB].map((m) => getAssociatedTokenAddressSync(m.publicKey, a.publicKey)))
-    .flat();
+    .flat()
 
   // Determined Escrow and Vault addresses
-  const seed = new anchor.BN(randomBytes(8));
+  const seed = new anchor.BN(randomBytes(8))
   const escrow = PublicKey.findProgramAddressSync(
     [Buffer.from("state"), seed.toArrayLike(Buffer, "le", 8)],
     program.programId
-  )[0];
-  const vault = getAssociatedTokenAddressSync(mintA.publicKey, escrow, true);
+  )[0]
+  const vault = getAssociatedTokenAddressSync(mintA.publicKey, escrow, true)
 
   // 2. Utils
   // Account Wrapper
@@ -51,27 +59,27 @@ describe("anchor-escrow", () => {
     associatedTokenprogram: ASSOCIATED_TOKEN_PROGRAM_ID,
     tokenProgram: TOKEN_PROGRAM_ID,
     systemProgram: SystemProgram.programId,
-  };
+  }
 
   const confirm = async (signature: string): Promise<string> => {
-    const block = await connection.getLatestBlockhash();
+    const block = await connection.getLatestBlockhash()
     await connection.confirmTransaction({
       signature,
       ...block,
-    });
-    return signature;
-  };
+    })
+    return signature
+  }
 
   const log = async (signature: string): Promise<string> => {
     console.log(
       `Your transaction signature: https://explorer.solana.com/transaction/${signature}?cluster=custom&customUrl=${connection.rpcEndpoint}`
-    );
-    return signature;
-  };
+    )
+    return signature
+  }
 
   it("Airdrop and create mints", async () => {
-    let lamports = await getMinimumBalanceForRentExemptMint(connection);
-    let tx = new Transaction();
+    let lamports = await getMinimumBalanceForRentExemptMint(connection)
+    let tx = new Transaction()
     tx.instructions = [
       ...[initializer, taker].map((k) =>
         SystemProgram.transfer({
@@ -97,22 +105,22 @@ describe("anchor-escrow", () => {
         createAssociatedTokenAccountIdempotentInstruction(provider.publicKey, x[2], x[1], x[0]),
         createMintToInstruction(x[0], x[2], x[1], 1e9),
       ]),
-    ];
+    ]
 
-    await provider.sendAndConfirm(tx, [mintA, mintB, initializer, taker]).then(log);
-  });
+    await provider.sendAndConfirm(tx, [mintA, mintB, initializer, taker]).then(log)
+  })
 
   it("Initialize", async () => {
-    const initializerAmount = 1e6;
-    const takerAmount = 1e6;
+    const initializerAmount = 1e6
+    const takerAmount = 1e6
     await program.methods
       .initialize(seed, new anchor.BN(initializerAmount), new anchor.BN(takerAmount))
       .accounts({ ...accounts })
       .signers([initializer])
       .rpc()
       .then(confirm)
-      .then(log);
-  });
+      .then(log)
+  })
 
   xit("Cancel", async () => {
     await program.methods
@@ -121,8 +129,8 @@ describe("anchor-escrow", () => {
       .signers([initializer])
       .rpc()
       .then(confirm)
-      .then(log);
-  });
+      .then(log)
+  })
 
   it("Exchange", async () => {
     await program.methods
@@ -131,7 +139,7 @@ describe("anchor-escrow", () => {
       .signers([taker])
       .rpc()
       .then(confirm)
-      .then(log);
+      .then(log)
 
     // For Degugging Purpose
 
@@ -156,5 +164,5 @@ describe("anchor-escrow", () => {
 
     // console.log(Buffer.from(tx.serialize()).toString("base64"));
     // await provider.sendAndConfirm(tx).then(log);
-  });
-});
+  })
+})
