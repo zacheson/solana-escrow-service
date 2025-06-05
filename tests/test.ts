@@ -1,5 +1,5 @@
 import * as anchor from "@coral-xyz/anchor"
-import { AnchorEscrow } from "../target/types/escrow_service"
+import { EscrowService } from "../target/types/escrow_service"
 import {
   Keypair,
   LAMPORTS_PER_SOL,
@@ -26,7 +26,7 @@ describe("escrow_service", () => {
   anchor.setProvider(anchor.AnchorProvider.env())
   const provider = anchor.getProvider()
   const connection = provider.connection
-  const program = anchor.workspace.AnchorEscrow as anchor.Program<AnchorEscrow>
+  const program = anchor.workspace.EscrowService as anchor.Program<EscrowService>
 
   // 1. Boilerplate
   // Determine dummy token mints and token account addresses
