@@ -1,8 +1,7 @@
 {
-  "name": "solana-escrow-poc",
-  "description": "Implementation of Solana Escrow POC",
+  "name": "solana-escrow-service",
+  "description": "Escrow Service on Solana",
   "version": "1.0.0",
-  "main": "index.js",
   "directories": {
     "test": "tests"
   },
@@ -11,17 +10,8 @@
     "deploy": "anchor deploy",
     "test": "anchor test --skip-build --skip-deploy"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ironaddicteddog/anchor-escrow.git"
-  },
   "keywords": [],
-  "author": "ironaddciteddog",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ironaddicteddog/anchor-escrow/issues"
-  },
-  "homepage": "https://github.com/ironaddicteddog/anchor-escrow#readme",
   "dependencies": {
     "@coral-xyz/anchor": "0.31.1",
     "@solana/spl-token": "^0.4.8"

@@ -1,12 +1,12 @@
 [package]
-description = "Solana Escrow POC"
-edition = "2018"
-name = "anchor-escrow"
+description = "Escrow Service on Solana"
+edition = "2025"
+name = "escrow-service"
 version = "0.1.0"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "anchor_escrow"
+name = "escrow_service"
 
 [features]
 cpi = ["no-entrypoint"]

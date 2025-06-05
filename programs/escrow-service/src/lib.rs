@@ -5,7 +5,7 @@ mod states;
 
 declare_id!("EZUZxExAfPrc4oQt5sXJcyNg4w113erzjkaPEX87BHEw");
 #[program]
-pub mod anchor_escrow {
+pub mod escrow_service {
     use super::*;
 
     pub fn initialize(
